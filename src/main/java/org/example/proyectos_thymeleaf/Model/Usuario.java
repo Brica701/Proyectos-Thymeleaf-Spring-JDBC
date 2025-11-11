@@ -7,8 +7,8 @@ import lombok.*;
 @Builder
 @Getter
 @Setter
-public class User {
+public class Usuario {
     private int id;
-    private String nombre;
-    private String email;
+    private String usuario;
+    private String contrasena;
 }

@@ -1,0 +1,53 @@
+package org.example.proyectos_thymeleaf.DAO;
+
+import org.example.proyectos_thymeleaf.Model.Usuario;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.sql.ResultSet;
+import java.util.List;
+
+@Repository
+public class UsuarioDAOImpl implements UsuarioDAO {
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Override
+    public Usuario validarUsuario(String usuario, String contrasena) {
+        // Convertimos la contraseña a SHA-256
+        String hash = sha256(contrasena);
+
+        String sql = "SELECT * FROM usuario WHERE usuario = ? AND contrasena = ?";
+        List<Usuario> usuarios = jdbcTemplate.query(sql, new Object[]{usuario, hash},
+                (ResultSet rs, int rowNum) -> {
+                    var u = new Usuario();
+                    u.setUsuario(rs.getString("usuario"));
+                    u.setContrasena(rs.getString("contrasena"));
+                    return u;
+                });
+
+        return usuarios.isEmpty() ? null : usuarios.get(0);
+    }
+
+    // Función que genera SHA-256 de un texto
+    private String sha256(String texto) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedhash = digest.digest(texto.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : encodedhash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
