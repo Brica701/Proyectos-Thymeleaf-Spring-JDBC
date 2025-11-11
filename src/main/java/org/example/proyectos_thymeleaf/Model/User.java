@@ -8,6 +8,7 @@ import lombok.*;
 @Getter
 @Setter
 public class User {
-    private String username;
-    private String password;
+    private int id;
+    private String nombre;
+    private String email;
 }
