@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class LoginController {
@@ -15,12 +16,14 @@ public class LoginController {
     @Autowired
     private UsuarioDAO usuarioDAO;
 
+    // --- Página de inicio (login) ---
     @GetMapping("/")
     public String mostrarLogin(Model model) {
         model.addAttribute("usuario", new Usuario());
         return "login";
     }
 
+    // --- Procesar el login ---
     @PostMapping("/login")
     public String procesarLogin(@ModelAttribute Usuario usuario, Model model) {
         var usuarioValido = usuarioDAO.validarUsuario(usuario.getUsuario(), usuario.getContrasena());
@@ -32,5 +35,31 @@ public class LoginController {
             model.addAttribute("error", "Usuario o contraseña incorrectos");
             return "login";
         }
+    }
+
+    // --- Generar la pirámide de gatos ---
+    @PostMapping("/piramide")
+    public String generarPiramide(@RequestParam int altura,
+                                  @RequestParam(required = false) String nombre,
+                                  Model model) {
+
+        // Imagen de gato/perro
+        String gatoImg = "<img class='cat' src='https://cdn-icons-png.flaticon.com/512/616/616408.png' alt='perro'>";
+
+        // Código para generar la pirámide
+        StringBuilder piramide = new StringBuilder();
+        for (int i = 1; i <= altura; i++) {
+            piramide.append("<div>");
+            for (int j = 1; j <= i; j++) {
+                piramide.append(gatoImg);
+            }
+            piramide.append("</div>");
+        }
+
+
+        model.addAttribute("nombre", nombre);
+        model.addAttribute("piramide", piramide.toString());
+
+        return "bienvenida";
     }
 }
