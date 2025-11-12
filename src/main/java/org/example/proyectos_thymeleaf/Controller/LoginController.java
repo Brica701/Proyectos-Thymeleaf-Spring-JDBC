@@ -16,38 +16,38 @@ public class LoginController {
     @Autowired
     private UsuarioDAO usuarioDAO;
 
-    // --- Página de inicio (login) ---
     @GetMapping("/")
     public String mostrarLogin(Model model) {
         model.addAttribute("usuario", new Usuario());
         return "login";
     }
 
-    // --- Procesar el login ---
     @PostMapping("/login")
     public String procesarLogin(@ModelAttribute Usuario usuario, Model model) {
         var usuarioValido = usuarioDAO.validarUsuario(usuario.getUsuario(), usuario.getContrasena());
 
         if (usuarioValido != null) {
-            model.addAttribute("nombre", usuarioValido.getUsuario());
-            return "bienvenida";
+            if ("admin".equalsIgnoreCase(usuarioValido.getUsuario())) {
+                // Ir al CRUD de usuarios
+                return "redirect:/usuarios";
+            } else {
+                model.addAttribute("nombre", usuarioValido.getUsuario());
+                return "bienvenida";
+            }
         } else {
             model.addAttribute("error", "Usuario o contraseña incorrectos");
             return "login";
         }
     }
 
-    // --- Generar la pirámide de gatos ---
     @PostMapping("/piramide")
     public String generarPiramide(@RequestParam int altura,
                                   @RequestParam(required = false) String nombre,
                                   Model model) {
 
-        // Imagen de gato/perro
-        String gatoImg = "<img class='cat' src='https://cdn-icons-png.flaticon.com/512/616/616408.png' alt='perro'>";
-
-        // Código para generar la pirámide
+        String gatoImg = "<img class='cat' src='https://cdn-icons-png.flaticon.com/512/616/616408.png' alt='gato'>";
         StringBuilder piramide = new StringBuilder();
+
         for (int i = 1; i <= altura; i++) {
             piramide.append("<div>");
             for (int j = 1; j <= i; j++) {
@@ -55,7 +55,6 @@ public class LoginController {
             }
             piramide.append("</div>");
         }
-
 
         model.addAttribute("nombre", nombre);
         model.addAttribute("piramide", piramide.toString());

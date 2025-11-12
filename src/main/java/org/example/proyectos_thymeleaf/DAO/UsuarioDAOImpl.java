@@ -19,7 +19,6 @@ public class UsuarioDAOImpl implements UsuarioDAO {
 
     @Override
     public Usuario validarUsuario(String usuario, String contrasena) {
-        // Convertimos la contraseña a SHA-256
         String hash = sha256(contrasena);
 
         String sql = "SELECT * FROM usuario WHERE usuario = ? AND contrasena = ?";
@@ -30,11 +29,35 @@ public class UsuarioDAOImpl implements UsuarioDAO {
                     u.setContrasena(rs.getString("contrasena"));
                     return u;
                 });
-
         return usuarios.isEmpty() ? null : usuarios.get(0);
     }
 
-    // Función que genera SHA-256 de un texto
+    @Override
+    public List<Usuario> listarUsuarios() {
+        String sql = "SELECT * FROM usuario";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+            Usuario u = new Usuario();
+            u.setUsuario(rs.getString("usuario"));
+            u.setContrasena(rs.getString("contrasena"));
+            return u;
+        });
+    }
+
+    @Override
+    public boolean existeUsuario(String usuario) {
+        String sql = "SELECT COUNT(*) FROM usuario WHERE usuario = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, usuario);
+        return count != null && count > 0;
+    }
+
+    @Override
+    public boolean insertarUsuario(Usuario usuario) {
+        if (existeUsuario(usuario.getUsuario())) return false;
+        String hash = sha256(usuario.getContrasena());
+        String sql = "INSERT INTO usuario (usuario, contrasena) VALUES (?, ?)";
+        return jdbcTemplate.update(sql, usuario.getUsuario(), hash) > 0;
+    }
+
     private String sha256(String texto) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
