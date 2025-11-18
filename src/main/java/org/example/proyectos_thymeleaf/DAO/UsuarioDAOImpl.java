@@ -14,8 +14,11 @@ import java.util.List;
 @Repository
 public class UsuarioDAOImpl implements UsuarioDAO {
 
-    @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    public UsuarioDAOImpl(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Override
     public Usuario validarUsuario(String usuario, String contrasena) {

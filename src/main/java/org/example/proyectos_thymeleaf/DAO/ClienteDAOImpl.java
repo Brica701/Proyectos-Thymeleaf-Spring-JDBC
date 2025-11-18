@@ -11,8 +11,11 @@ import java.util.List;
 @Repository
 public class ClienteDAOImpl implements ClienteDAO {
 
-    @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    public ClienteDAOImpl(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     private Cliente mapRow(ResultSet rs, int rowNum) throws java.sql.SQLException {
         Cliente c = new Cliente();
