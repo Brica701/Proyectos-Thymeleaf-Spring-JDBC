@@ -6,8 +6,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Getter
-@Setter
+@Data
 public class Cliente {
     private int cliente_id;
     private String nombre_completo;
